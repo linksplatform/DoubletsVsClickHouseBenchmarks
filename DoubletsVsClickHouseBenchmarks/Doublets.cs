@@ -23,8 +23,8 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
     public IConverter<string, TLinkAddress> StringToUnicodeSequenceConverter;
     public UnitedMemoryLinks<TLinkAddress> UnitedMemoryLinksStorage;
     public TLinkAddress TypeLinkAddress;
-    public TLinkAddress StartTimeTypeLinkAddress;
     public TLinkAddress CandleTypeLinkAddress;
+    public TLinkAddress StartTimeTypeLinkAddress;
     public TLinkAddress OpeningPriceTypeLinkAddress;
     public TLinkAddress ClosingPriceTypeLinkAddress;
     public TLinkAddress HighestPriceTypeLinkAddress;
