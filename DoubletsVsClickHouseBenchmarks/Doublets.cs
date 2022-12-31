@@ -114,4 +114,20 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
             }
         }
     }
+
+    public void GetCandles(DateTimeOffset minimumTime, DateTimeOffset maximumTime)
+    {
+        List<Candle> candleList = new List<Candle>();
+        UnitedMemoryLinksStorage.Each(restriction: new Link<TLinkAddress>(index: UnitedMemoryLinksStorage.Constants.Any, source: StartTimeTypeLinkAddress, target: UnitedMemoryLinksStorage.Constants.Any), handler: link =>
+        {
+            Link<TLinkAddress> linkStruct = new Link<TLinkAddress>(link);
+            TLinkAddress startTime = RawNumberToAddressConverter.Convert(linkStruct.Target);
+            if (minimumTime.ToUnixTimeMilliseconds() < startTime && maximumTime.ToUnixTimeMilliseconds() > startTime)
+            {
+                
+            }
+            return UnitedMemoryLinksStorage.Constants.Continue;
+        });
+        return candleList;
+    }
 }
