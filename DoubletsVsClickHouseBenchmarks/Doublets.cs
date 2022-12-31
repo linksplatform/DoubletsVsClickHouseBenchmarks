@@ -63,6 +63,32 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
         return UnitedMemoryLinksStorage.GetOrCreate(source: baseTypeLinkAddress, target: typeNameStringLinkAddress);
     }
 
+    public void SaveCandle(Candle candle)
+    {
+        TLinkAddress startingTimeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: StartTimeTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.StartingTime.ToUnixTimeMilliseconds()));
+        TLinkAddress openingPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: OpeningPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.OpeningPrice));
+        TLinkAddress closingpriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: ClosingPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.ClosingPrice));
+        TLinkAddress highestPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: HighestPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.HighestPrice));
+        TLinkAddress lowestPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: LowestPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.LowestPrice));
+        TLinkAddress volumeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: VolumeTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.Volume));
+        List<TLinkAddress> candlePropertyLinkAddressList = new List<TLinkAddress>() { startingTimeLinkAddress, openingPriceLinkAddress, closingpriceLinkAddress, highestPriceLinkAddress, lowestPriceLinkAddress, volumeLinkAddress };
+        UnitedMemoryLinksStorage.GetOrCreate(source: CandleTypeLinkAddress, target: BalancedVariantConverter.Convert(candlePropertyLinkAddressList));
+    }
+
+    public Candle ParseCandleFromCsv(string[] cvsValues)
+    {
+        Candle candle = new Candle()
+        {
+            StartingTime = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(cvsValues[0])),
+            OpeningPrice = decimal.Parse(cvsValues[1]),
+            ClosingPrice = decimal.Parse(cvsValues[2]),
+            HighestPrice = decimal.Parse(cvsValues[3]),
+            LowestPrice = decimal.Parse(cvsValues[4]),
+            Volume = long.Parse(cvsValues[5]),
+        };
+        return candle;
+    }
+
     public void SaveCandles(string cvsFilePath)
     {
         using (var reader = new StreamReader(path: cvsFilePath))
