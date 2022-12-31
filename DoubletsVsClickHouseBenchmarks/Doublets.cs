@@ -97,20 +97,8 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
             {
                 string? line = reader.ReadLine();
                 string[] values = line.Split(separator: ';');
-                int startingTime = int.Parse(values[0]);
-                int openingPrice = int.Parse(values[1]);
-                int closingprice = int.Parse(values[2]);
-                int highestPrice = int.Parse(values[3]);
-                int lowestPrice = int.Parse(values[4]);
-                int volume = int.Parse(values[5]);
-                TLinkAddress startingTimeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: StartTimeTypeLinkAddress, target: AddressToRawNumberConverter.Convert(startingTime));
-                TLinkAddress openingPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: OpeningPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(openingPrice));
-                TLinkAddress closingpriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: ClosingPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(closingprice));
-                TLinkAddress highestPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: HighestPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(highestPrice));
-                TLinkAddress lowestPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: LowestPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(lowestPrice));
-                TLinkAddress volumeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: VolumeTypeLinkAddress, target: AddressToRawNumberConverter.Convert(volume));
-                List<TLinkAddress> candlePropertyLinkAddressList = new List<TLinkAddress>() { startingTimeLinkAddress, openingPriceLinkAddress, closingpriceLinkAddress, highestPriceLinkAddress, lowestPriceLinkAddress, volumeLinkAddress };
-                UnitedMemoryLinksStorage.GetOrCreate(source: CandleTypeLinkAddress, target: BalancedVariantConverter.Convert(candlePropertyLinkAddressList));
+                Candle candle = ParseCandleFromCsv(values);
+                SaveCandle(candle);
             }
         }
     }
