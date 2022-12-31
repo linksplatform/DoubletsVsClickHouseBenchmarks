@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Numerics;
+using Platform.Collections.Stacks;
 using Platform.Converters;
 using Platform.Data;
 using Platform.Data.Doublets;
@@ -6,6 +8,7 @@ using Platform.Data.Doublets.CriterionMatchers;
 using Platform.Data.Doublets.Memory;
 using Platform.Data.Doublets.Memory.United.Generic;
 using Platform.Data.Doublets.Sequences.Converters;
+using Platform.Data.Doublets.Sequences.Walkers;
 using Platform.Data.Doublets.Unicode;
 using Platform.Data.Numbers.Raw;
 using Platform.IO;
@@ -24,7 +27,7 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
     public UnitedMemoryLinks<TLinkAddress> UnitedMemoryLinksStorage;
     public TLinkAddress TypeLinkAddress;
     public TLinkAddress CandleTypeLinkAddress;
-    public TLinkAddress StartTimeTypeLinkAddress;
+    public TLinkAddress StartingTimeTypeLinkAddress;
     public TLinkAddress OpeningPriceTypeLinkAddress;
     public TLinkAddress ClosingPriceTypeLinkAddress;
     public TLinkAddress HighestPriceTypeLinkAddress;
@@ -49,7 +52,7 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
         UnicodeSymbolToCharConverter<TLinkAddress> unicodeSymbolToCharConverter = new(links: UnitedMemoryLinksStorage, numberToAddressConverter: RawNumberToAddressConverter, unicodeSymbolCriterionMatcher: unicodeSymbolCriterionMatcher);
         StringToUnicodeSequenceConverter = new CachingConverterDecorator<string, TLinkAddress>(baseConverter: new StringToUnicodeSequenceConverter<TLinkAddress>(links: UnitedMemoryLinksStorage, charToUnicodeSymbolConverter: charToUnicodeSymbolConverter, listToSequenceLinkConverter: BalancedVariantConverter, unicodeSequenceMarker: unicodeSequenceType));
         CandleTypeLinkAddress = CreateType(TypeLinkAddress, nameof(CandleTypeLinkAddress));
-        StartTimeTypeLinkAddress = CreateType(TypeLinkAddress, nameof(StartTimeTypeLinkAddress));
+        StartingTimeTypeLinkAddress = CreateType(TypeLinkAddress, nameof(StartingTimeTypeLinkAddress));
         OpeningPriceTypeLinkAddress = CreateType(TypeLinkAddress, nameof(OpeningPriceTypeLinkAddress));
         ClosingPriceTypeLinkAddress = CreateType(TypeLinkAddress, nameof(ClosingPriceTypeLinkAddress));
         HighestPriceTypeLinkAddress = CreateType(TypeLinkAddress, nameof(HighestPriceTypeLinkAddress));
@@ -65,7 +68,7 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
 
     public void SaveCandle(Candle candle)
     {
-        TLinkAddress startingTimeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: StartTimeTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.StartingTime.ToUnixTimeMilliseconds()));
+        TLinkAddress startingTimeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: StartingTimeTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.StartingTime.ToUnixTimeMilliseconds()));
         TLinkAddress openingPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: OpeningPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.OpeningPrice));
         TLinkAddress closingpriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: ClosingPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.ClosingPrice));
         TLinkAddress highestPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: HighestPriceTypeLinkAddress, target: AddressToRawNumberConverter.Convert(candle.HighestPrice));
@@ -103,17 +106,127 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
         }
     }
 
+    public bool IsCandleProperty(TLinkAddress linkAddress)
+    {
+        TLinkAddress[] allowedTypeLinkAddressArray = new TLinkAddress[]
+        {
+            StartingTimeTypeLinkAddress, OpeningPriceTypeLinkAddress, ClosingPriceTypeLinkAddress, HighestPriceTypeLinkAddress, LowestPriceTypeLinkAddress, VolumeTypeLinkAddress
+        };
+        return allowedTypeLinkAddressArray.Contains(UnitedMemoryLinksStorage.GetSource(linkAddress));
+    }
+
+    public bool HasType(TLinkAddress linkAddress, TLinkAddress typeLinkAddress)
+    {
+        return typeLinkAddress == UnitedMemoryLinksStorage.GetSource(linkAddress);
+    }
+
+    public void EnsureHasType(TLinkAddress linkAddress, TLinkAddress typeLinkAddress)
+    {
+        if (!HasType(linkAddress, typeLinkAddress))
+        {
+            throw new Exception($"{linkAddress} is not of {typeLinkAddress} type. {linkAddress} source must be {typeLinkAddress}");
+        }
+    }
+
+
+    public DateTimeOffset GetStartingTime(TLinkAddress startingTimeLinkAddress)
+    {
+        EnsureHasType(startingTimeLinkAddress, StartingTimeTypeLinkAddress);
+        TLinkAddress valueLinkAddress = UnitedMemoryLinksStorage.GetTarget(startingTimeLinkAddress);
+        return DateTimeOffset.FromUnixTimeMilliseconds(RawNumberToAddressConverter.Convert(valueLinkAddress));
+    }
+    
+    public long GetOpeningPrice(TLinkAddress openingPriceLinkAddress)
+    {
+        EnsureHasType(openingPriceLinkAddress, OpeningPriceTypeLinkAddress);
+        TLinkAddress valueLinkAddress = UnitedMemoryLinksStorage.GetTarget(openingPriceLinkAddress);
+        return RawNumberToAddressConverter.Convert(valueLinkAddress);
+    }
+    
+    public long GetClosingPrice(TLinkAddress closingPriceLinkAddress)
+    {
+        EnsureHasType(closingPriceLinkAddress, ClosingPriceTypeLinkAddress);
+        TLinkAddress valueLinkAddress = UnitedMemoryLinksStorage.GetTarget(closingPriceLinkAddress);
+        return RawNumberToAddressConverter.Convert(valueLinkAddress);
+    }
+    
+    public long GetLowestPrice(TLinkAddress lowestPriceLinkAddress)
+    {
+        EnsureHasType(lowestPriceLinkAddress, LowestPriceTypeLinkAddress);
+        TLinkAddress valueLinkAddress = UnitedMemoryLinksStorage.GetTarget(lowestPriceLinkAddress);
+        return RawNumberToAddressConverter.Convert(valueLinkAddress);
+    }
+    
+    public long GetHighestPrice(TLinkAddress highestPriceLinkAddress)
+    {
+        EnsureHasType(highestPriceLinkAddress, HighestPriceTypeLinkAddress);
+        TLinkAddress valueLinkAddress = UnitedMemoryLinksStorage.GetTarget(highestPriceLinkAddress);
+        return RawNumberToAddressConverter.Convert(valueLinkAddress);
+    }
+    
+    public long GetVolume(TLinkAddress volumeLinkAddress)
+    {
+        EnsureHasType(volumeLinkAddress, VolumeTypeLinkAddress);
+        TLinkAddress valueLinkAddress = UnitedMemoryLinksStorage.GetTarget(volumeLinkAddress);
+        return RawNumberToAddressConverter.Convert(valueLinkAddress);
+    }
+
+    public IEnumerable<TLinkAddress> GetCandleProperties(TLinkAddress candleLinkAddress)
+    {
+        TLinkAddress candlePropertiesSequenceLinkAddress = UnitedMemoryLinksStorage.GetTarget(candleLinkAddress);
+        RightSequenceWalker<TLinkAddress> rightSequenceWalker = new RightSequenceWalker<TLinkAddress>(links: UnitedMemoryLinksStorage, new DefaultStack<TLinkAddress>(), isElement: IsCandleProperty);
+        return rightSequenceWalker.Walk(candlePropertiesSequenceLinkAddress);
+    }
+
+    public Candle GetCandle(TLinkAddress candleLinkAddress)
+    {
+        EnsureHasType(candleLinkAddress, CandleTypeLinkAddress);
+        Link<TLinkAddress> linkStruct = new Link<TLinkAddress>(UnitedMemoryLinksStorage.GetLink(candleLinkAddress));
+        RightSequenceWalker<TLinkAddress> rightSequenceWalker = new RightSequenceWalker<TLinkAddress>(links: UnitedMemoryLinksStorage, new DefaultStack<TLinkAddress>(), isElement: IsCandleProperty);
+        Candle candle = new Candle();
+        IEnumerable<TLinkAddress> candleProperties = GetCandleProperties(candleLinkAddress);
+        foreach (TLinkAddress candlePropertyLinkAddress in candleProperties)
+        {
+            TLinkAddress candlePropertyTypeLinkAddress = UnitedMemoryLinksStorage.GetSource(candlePropertyLinkAddress);
+            if (candlePropertyTypeLinkAddress == StartingTimeTypeLinkAddress)
+            {
+                candle.StartingTime = GetStartingTime(candlePropertyLinkAddress);
+            } 
+            else if (candlePropertyTypeLinkAddress == OpeningPriceTypeLinkAddress)
+            {
+                candle.OpeningPrice = GetOpeningPrice(candlePropertyLinkAddress);
+            }
+            else if (candlePropertyTypeLinkAddress == ClosingPriceTypeLinkAddress)
+            {
+                candle.OpeningPrice = GetClosingPrice(candlePropertyLinkAddress);
+            }
+            else if (candlePropertyTypeLinkAddress == HighestPriceTypeLinkAddress)
+            {
+                candle.OpeningPrice = GetHighestPrice(candlePropertyLinkAddress);
+            }
+            else if (candlePropertyTypeLinkAddress == LowestPriceTypeLinkAddress)
+            {
+                candle.OpeningPrice = GetLowestPrice(candlePropertyLinkAddress);
+            }
+            else if (candlePropertyTypeLinkAddress == HighestPriceTypeLinkAddress)
+            {
+                candle.OpeningPrice = GetHighestPrice(candlePropertyLinkAddress);
+            }
+            else
+            {
+                throw new Exception($"The target of {candleLinkAddress} must be a sequence of candle properties");
+            }
+        }
+        return candle;
+    }
+
     public void GetCandles(DateTimeOffset minimumTime, DateTimeOffset maximumTime)
     {
         List<Candle> candleList = new List<Candle>();
-        UnitedMemoryLinksStorage.Each(restriction: new Link<TLinkAddress>(index: UnitedMemoryLinksStorage.Constants.Any, source: StartTimeTypeLinkAddress, target: UnitedMemoryLinksStorage.Constants.Any), handler: link =>
+        UnitedMemoryLinksStorage.Each(restriction: new Link<TLinkAddress>(index: UnitedMemoryLinksStorage.Constants.Any, source: CandleTypeLinkAddress, target: UnitedMemoryLinksStorage.Constants.Any), handler: (IList<TLinkAddress> link) =>
         {
-            Link<TLinkAddress> linkStruct = new Link<TLinkAddress>(link);
-            TLinkAddress startTime = RawNumberToAddressConverter.Convert(linkStruct.Target);
-            if (minimumTime.ToUnixTimeMilliseconds() < startTime && maximumTime.ToUnixTimeMilliseconds() > startTime)
-            {
-                
-            }
+            Candle candle = GetCandle(UnitedMemoryLinksStorage.GetIndex(link));
+            candleList.Add(candle);
             return UnitedMemoryLinksStorage.Constants.Continue;
         });
         return candleList;
