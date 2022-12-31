@@ -181,8 +181,6 @@ public class Doublets<TLinkAddress> where TLinkAddress : IUnsignedNumber<TLinkAd
     public Candle GetCandle(TLinkAddress candleLinkAddress)
     {
         EnsureHasType(candleLinkAddress, CandleTypeLinkAddress);
-        Link<TLinkAddress> linkStruct = new Link<TLinkAddress>(UnitedMemoryLinksStorage.GetLink(candleLinkAddress));
-        RightSequenceWalker<TLinkAddress> rightSequenceWalker = new RightSequenceWalker<TLinkAddress>(links: UnitedMemoryLinksStorage, new DefaultStack<TLinkAddress>(), isElement: IsCandleProperty);
         Candle candle = new Candle();
         IEnumerable<TLinkAddress> candleProperties = GetCandleProperties(candleLinkAddress);
         foreach (TLinkAddress candlePropertyLinkAddress in candleProperties)
