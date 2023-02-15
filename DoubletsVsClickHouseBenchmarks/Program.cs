@@ -1,23 +1,29 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using ClickHouse.Client.ADO;
+using CommandLine;
 using DoubletsVsClickHouseBenchmarks;
 using TLinkAddress = System.UInt64;
 
 namespace Platform.Data.Doublets.Benchmarks
 {
-    [SimpleJob]
-    [MemoryDiagnoser]
-    public class DoubletsVsClickHouseBenchmarks
+    
+    // public class Options
+    // {
+    //     [Option( longName: "csvFilePath", Required = true, HelpText = "Path of CSV file which contains candles.")]
+    //     public bool CsvFilePath { get; set; }
+    //     
+    //     [Option( longName: "clickHouseConnectionString", Required = true, HelpText = "Path of CSV file which contains candles.")]
+    //     public bool ClickHouseConnectionString { get; set; }
+    // }
+    
+    class Program
     {
-        public static string csvFilePath = "";
-        public static DateTimeOffset MaximumTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
-        public static DateTimeOffset MinimumTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UnixEpoch.ToUnixTimeSeconds());
-        
-        [Benchmark]
-        public void LinksPlatformBenchmark()
+        static void Main(string[] args)
         {
-            Doublets<TLinkAddress> doublets = new Doublets<ulong>();
-            doublets.SaveCandles(csvFilePath);
-            
+            // var a = Parser.Default.ParseArguments<Options>(args);
+            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
         }
     }
 }
