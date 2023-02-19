@@ -230,4 +230,16 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
         });
         return candleList;
     }
+
+    public Task RemoveCandles(IList<Candle> candles)
+    {
+        UnitedMemoryLinksStorage.Each(new Link<TLinkAddress>(UnitedMemoryLinksStorage.Constants.Any, CandleTypeLinkAddress, UnitedMemoryLinksStorage.Constants.Any), link =>
+        {
+            Link<TLinkAddress> linkStruct = new Link<TLinkAddress>(link);
+            // TLinkAddress candlePropertiesLinkAddress = linkStruct.Target;
+            UnitedMemoryLinksStorage.ClearGarbage(linkStruct.Index);
+            return UnitedMemoryLinksStorage.Constants.Continue;
+        });
+        throw new NotImplementedException();
+    }
 }

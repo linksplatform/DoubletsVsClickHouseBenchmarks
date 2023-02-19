@@ -66,4 +66,9 @@ WHERE
         }
         return candles;
     }
+
+    public async Task RemoveCandles(IList<Candle> candles)
+    {
+        ClickHouseConnection.ExecuteStatementAsync("TRUNCATE TABLE candles");
+    }
 }
