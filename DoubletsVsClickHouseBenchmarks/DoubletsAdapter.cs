@@ -21,6 +21,8 @@ namespace DoubletsVsClickHouseBenchmarks;
 public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress : struct, IUnsignedNumber<TLinkAddress>, IShiftOperators<TLinkAddress,int,TLinkAddress>, IBitwiseOperators<TLinkAddress,TLinkAddress,TLinkAddress>, IMinMaxValue<TLinkAddress>, IComparisonOperators<TLinkAddress, TLinkAddress, bool>
 {
     public AddressToRawNumberConverter<TLinkAddress> AddressToRawNumberConverter;
+    public BigIntegerToRawNumberSequenceConverter<TLinkAddress> BigIntegerToRawNumberSequenceConverter;
+    public RawNumberSequenceToBigIntegerConverter<TLinkAddress> RawNumberSequenceToBigIntegerConverter;
     public DecimalToRationalConverter<TLinkAddress> DecimalToRationalConverter;
     public RationalToDecimalConverter<TLinkAddress> RationalToDecimalConverter;
     public NumberToLongRawNumberSequenceConverter<long, TLinkAddress> LongNumberToLongRawNumberSequenceConverter;
@@ -33,6 +35,7 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
     public IConverter<string, TLinkAddress> StringToUnicodeSequenceConverter;
     public UnitedMemoryLinks<TLinkAddress> UnitedMemoryLinksStorage;
     public TLinkAddress TypeLinkAddress;
+    public TLinkAddress NegativeNumberTypeLinkAddress;
     public TLinkAddress CandleTypeLinkAddress;
     public TLinkAddress StartingTimeTypeLinkAddress;
     public TLinkAddress OpeningPriceTypeLinkAddress;
@@ -59,6 +62,13 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
         CharToUnicodeSymbolConverter<TLinkAddress> charToUnicodeSymbolConverter = new(links: UnitedMemoryLinksStorage, addressToNumberConverter: AddressToRawNumberConverter, unicodeSymbolMarker: unicodeSymbolType);
         UnicodeSymbolToCharConverter<TLinkAddress> unicodeSymbolToCharConverter = new(links: UnitedMemoryLinksStorage, numberToAddressConverter: RawNumberToAddressConverter, unicodeSymbolCriterionMatcher: unicodeSymbolCriterionMatcher);
         StringToUnicodeSequenceConverter = new CachingConverterDecorator<string, TLinkAddress>(baseConverter: new StringToUnicodeSequenceConverter<TLinkAddress>(links: UnitedMemoryLinksStorage, charToUnicodeSymbolConverter: charToUnicodeSymbolConverter, listToSequenceLinkConverter: BalancedVariantConverter, unicodeSequenceMarker: unicodeSequenceType));
+        NegativeNumberTypeLinkAddress = CreateType(TypeLinkAddress, nameof(CandleTypeLinkAddress));
+        BigIntegerToRawNumberSequenceConverter = new BigIntegerToRawNumberSequenceConverter<TLinkAddress>(UnitedMemoryLinksStorage, AddressToRawNumberConverter, BalancedVariantConverter, NegativeNumberTypeLinkAddress);
+        RawNumberSequenceToBigIntegerConverter = new RawNumberSequenceToBigIntegerConverter<TLinkAddress>(UnitedMemoryLinksStorage, RawNumberToAddressConverter, NegativeNumberTypeLinkAddress);
+        LongNumberToLongRawNumberSequenceConverter = new NumberToLongRawNumberSequenceConverter<Int64, TLinkAddress>(UnitedMemoryLinksStorage, AddressToRawNumberConverter);
+        LongRawNumberSequenceToLongNumberConverter = new LongRawNumberSequenceToNumberConverter<TLinkAddress, Int64>(UnitedMemoryLinksStorage, RawNumberToAddressConverter);
+        RationalToDecimalConverter = new RationalToDecimalConverter<TLinkAddress>(UnitedMemoryLinksStorage, RawNumberSequenceToBigIntegerConverter);
+        DecimalToRationalConverter = new DecimalToRationalConverter<TLinkAddress>(UnitedMemoryLinksStorage, BigIntegerToRawNumberSequenceConverter);
         CandleTypeLinkAddress = CreateType(TypeLinkAddress, nameof(CandleTypeLinkAddress));
         StartingTimeTypeLinkAddress = CreateType(TypeLinkAddress, nameof(StartingTimeTypeLinkAddress));
         OpeningPriceTypeLinkAddress = CreateType(TypeLinkAddress, nameof(OpeningPriceTypeLinkAddress));
@@ -231,15 +241,13 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
         return candleList;
     }
 
-    public Task RemoveCandles(IList<Candle> candles)
+    public async Task RemoveCandles()
     {
         UnitedMemoryLinksStorage.Each(new Link<TLinkAddress>(UnitedMemoryLinksStorage.Constants.Any, CandleTypeLinkAddress, UnitedMemoryLinksStorage.Constants.Any), link =>
         {
             Link<TLinkAddress> linkStruct = new Link<TLinkAddress>(link);
-            // TLinkAddress candlePropertiesLinkAddress = linkStruct.Target;
             UnitedMemoryLinksStorage.ClearGarbage(linkStruct.Index);
             return UnitedMemoryLinksStorage.Constants.Continue;
         });
-        throw new NotImplementedException();
     }
 }

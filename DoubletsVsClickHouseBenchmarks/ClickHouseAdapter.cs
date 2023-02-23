@@ -22,6 +22,7 @@ namespace DoubletsVsClickHouseBenchmarks;
 
 public class ClickHouseAdapter : IBenchmarkable
 {
+    public Uri restApiUri = new Uri("http://localhost:8123");
     public ClickHouseConnection ClickHouseConnection;
     
     public ClickHouseAdapter(ClickHouseConnection сlickHouseConnection)
@@ -34,7 +35,7 @@ public class ClickHouseAdapter : IBenchmarkable
         using var bulkCopyInterface = new ClickHouseBulkCopy(ClickHouseConnection)
         {
             DestinationTableName = "candles",
-            BatchSize = 100000
+            BatchSize = candles.Count
         };
         var candleRows = candles.Select((candle) => new object[] { candle.StartingTime, candle.OpeningPrice, candle.ClosingPrice, candle.LowestPrice, candle.HighestPrice, candle.Volume });
         await bulkCopyInterface.WriteToServerAsync(candleRows);
@@ -67,7 +68,7 @@ WHERE
         return candles;
     }
 
-    public async Task RemoveCandles(IList<Candle> candles)
+    public async Task RemoveCandles()
     {
         ClickHouseConnection.ExecuteStatementAsync("TRUNCATE TABLE candles");
     }
