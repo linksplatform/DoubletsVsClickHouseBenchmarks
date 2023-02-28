@@ -12,8 +12,8 @@ namespace Platform.Data.Doublets.Benchmarks;
 [MemoryDiagnoser]
 public class DoubletsVsClickHouseBenchmarks
 {
-    public static string ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName;
-    public static string CsvFilePath = "/home/freephoenix888/Programming/linksplatform/DoubletsVsClickHouseBenchmarks/DoubletsVsClickHouseBenchmarks/DoubletsVsClickHouseBenchmarks/MSFT.csv";
+    // public static string ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName;
+    public static string CsvFilePath = "/workspace/DoubletsVsClickHouseBenchmarks/MSFT.csv";
     public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
     public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
     public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
@@ -21,8 +21,8 @@ public class DoubletsVsClickHouseBenchmarks
 
     public IEnumerable<IBenchmarkable> Benchmarkables { get; } = new IBenchmarkable[]
     {
+        new ClickHouseAdapter(ClickHouseConnection),
         new DoubletsAdapter<UInt64>(),
-        // new ClickHouseAdapter(ClickHouseConnection)
     };
 
     [ParamsSource(nameof(Benchmarkables))] public IBenchmarkable Benchmarkable { get; set; }
@@ -56,10 +56,10 @@ public class DoubletsVsClickHouseBenchmarks
     }
     
     [Benchmark]
-    public void LinksPlatformBenchmark()
+    public async Task LinksPlatformBenchmark()
     {
-        Benchmarkable.RemoveCandles();
-        Benchmarkable.SaveCandles(Candles);
-        Benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime);
+        await Benchmarkable.RemoveCandles();
+        await Benchmarkable.SaveCandles(Candles);
+        await Benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime);
     }
 }

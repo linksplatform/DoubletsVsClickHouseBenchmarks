@@ -47,6 +47,7 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
 
     public DoubletsAdapter()
     {
+        Console.WriteLine("New doublets storage");
         LinksConstants = new LinksConstants<TLinkAddress>(enableExternalReferencesSupport: true);
         UnitedMemoryLinksStorage = new UnitedMemoryLinks<TLinkAddress>(memory: new FileMappedResizableDirectMemory(path: LinksStorageFilePath.Filename), memoryReservationStep: UnitedMemoryLinks<TLinkAddress>.DefaultLinksSizeStep, constants: LinksConstants, indexTreeType: IndexTreeType.Default);
         BalancedVariantConverter = new BalancedVariantConverter<TLinkAddress>(links: UnitedMemoryLinksStorage);
@@ -87,7 +88,8 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
 
     public void SaveCandle(Candle candle)
     {
-        TLinkAddress startingTimeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: StartingTimeTypeLinkAddress, target: LongNumberToLongRawNumberSequenceConverter.Convert(candle.StartingTime.ToUnixTimeMilliseconds()));
+        // Console.WriteLine("Saving candle");
+        TLinkAddress startingTimeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: StartingTimeTypeLinkAddress, target: LongNumberToLongRawNumberSequenceConverter.Convert(candle.StartingTime.ToUnixTimeSeconds()));
         TLinkAddress openingPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: OpeningPriceTypeLinkAddress, target: DecimalToRationalConverter.Convert(candle.OpeningPrice));
         TLinkAddress closingpriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: ClosingPriceTypeLinkAddress, target: DecimalToRationalConverter.Convert(candle.ClosingPrice));
         TLinkAddress highestPriceLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: HighestPriceTypeLinkAddress, target: DecimalToRationalConverter.Convert(candle.HighestPrice));

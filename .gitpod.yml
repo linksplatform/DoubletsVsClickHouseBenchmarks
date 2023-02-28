@@ -1,5 +1,11 @@
 image: gitpod/workspace-dotnet
 
+tasks:
+  - name: Install Expect CLI Program
+    before: sudo apt install expect
+  - name: Install Expect CLI Program
+    before: sudo ./install-clickhouse.sh
+
 vscode:
   extensions:
     - muhammad-sammy.csharp

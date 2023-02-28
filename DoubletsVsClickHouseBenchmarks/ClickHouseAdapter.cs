@@ -50,6 +50,7 @@ WHERE
 	({minimumStartingTime.ToUnixTimeSeconds()} < starting_time)
 	AND
 	(starting_time < {maximumStartingTime.ToUnixTimeSeconds()})
+SETTINGS lock_acquire_timeout = 500
 ";
         using var reader = await ClickHouseConnection.ExecuteReaderAsync(sql);
         while (reader.Read())
@@ -70,6 +71,6 @@ WHERE
 
     public async Task RemoveCandles()
     {
-        await ClickHouseConnection.ExecuteStatementAsync("TRUNCATE TABLE candles");
+        await ClickHouseConnection.ExecuteStatementAsync("TRUNCATE TABLE candles SETTINGS lock_acquire_timeout = 500");
     }
 }

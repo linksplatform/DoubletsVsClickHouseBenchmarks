@@ -15,4 +15,8 @@ CREATE TABLE candles (
     PRIMARY KEY (StartingTime)
 ) ENGINE = MergeTree()
 ORDER BY StartingTime;
+
+url=$(gp url 8443)
+stripped_url="${url#https://}"
+export ClickHouseConnection="Host=${stripped_url};Protocol=https;Username=default;Password=123;Timeout=500"
 ```
