@@ -28,7 +28,7 @@ namespace Platform.Data.Doublets.Benchmarks
         static void Main(string[] args)
         {
             // var a = Parser.Default.ParseArguments<Options>(args);
-            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+            var summary = BenchmarkRunner.Run<DoubletsVsClickHouseBenchmarks>();   
         }
     }
 }

@@ -51,7 +51,7 @@ WHERE
 	AND
 	(starting_time < {maximumStartingTime.ToUnixTimeSeconds()})
 ";
-        using var reader = ClickHouseConnection.ExecuteReaderAsync(sql).Result;
+        using var reader = await ClickHouseConnection.ExecuteReaderAsync(sql);
         while (reader.Read())
         {
             Candle candle = new Candle()
@@ -70,6 +70,6 @@ WHERE
 
     public async Task RemoveCandles()
     {
-        ClickHouseConnection.ExecuteStatementAsync("TRUNCATE TABLE candles");
+        await ClickHouseConnection.ExecuteStatementAsync("TRUNCATE TABLE candles");
     }
 }

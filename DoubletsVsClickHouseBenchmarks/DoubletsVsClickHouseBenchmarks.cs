@@ -22,7 +22,7 @@ public class DoubletsVsClickHouseBenchmarks
     public IEnumerable<IBenchmarkable> Benchmarkables { get; } = new IBenchmarkable[]
     {
         new DoubletsAdapter<UInt64>(),
-        new ClickHouseAdapter(ClickHouseConnection)
+        // new ClickHouseAdapter(ClickHouseConnection)
     };
 
     [ParamsSource(nameof(Benchmarkables))] public IBenchmarkable Benchmarkable { get; set; }
