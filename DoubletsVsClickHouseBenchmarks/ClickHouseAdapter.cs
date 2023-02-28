@@ -32,13 +32,17 @@ public class ClickHouseAdapter : IBenchmarkable
     
     public async Task SaveCandles(IList<Candle> candles)
     {
-        using var bulkCopyInterface = new ClickHouseBulkCopy(ClickHouseConnection)
+        var chunkedCandles = candles.Chunk(100000);
+        Parallel.ForEach(chunkedCandles, async candlesChunk =>
         {
-            DestinationTableName = "candles",
-            BatchSize = candles.Count
-        };
-        var candleRows = candles.Select((candle) => new object[] { candle.StartingTime, candle.OpeningPrice, candle.ClosingPrice, candle.LowestPrice, candle.HighestPrice, candle.Volume });
-        await bulkCopyInterface.WriteToServerAsync(candleRows);
+            using var bulkCopyInterface = new ClickHouseBulkCopy(ClickHouseConnection)
+            {
+                DestinationTableName = "candles",
+                BatchSize = candlesChunk.Length
+            };
+            var candleRows = candlesChunk.Select((candle) => new object[] { candle.StartingTime, candle.OpeningPrice, candle.ClosingPrice, candle.LowestPrice, candle.HighestPrice, candle.Volume });
+            await bulkCopyInterface.WriteToServerAsync(candleRows);
+        });
     }
     
     public async Task<IList<Candle>> GetCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
