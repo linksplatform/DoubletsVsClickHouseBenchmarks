@@ -28,6 +28,18 @@ public class ClickHouseAdapter : IBenchmarkable
     public ClickHouseAdapter(ClickHouseConnection сlickHouseConnection)
     {
         ClickHouseConnection = сlickHouseConnection;
+        ClickHouseConnection.ExecuteStatementAsync(@"
+  CREATE TABLE IF NOT EXISTS candles (
+    starting_time TIMESTAMP NOT NULL,
+    opening_price DECIMAL(18, 8) NOT NULL,
+    closing_price DECIMAL(18, 8) NOT NULL,
+    highest_price DECIMAL(18, 8) NOT NULL,
+    lowest_price DECIMAL(18, 8) NOT NULL,
+    volume BIGINT NOT NULL,
+  PRIMARY KEY (starting_time)
+  ) ENGINE = MergeTree()
+  ORDER BY starting_time;
+").Wait();
     }
     
 public async Task SaveCandles(IList<Candle> candles)
