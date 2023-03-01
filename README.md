@@ -1,20 +1,31 @@
 # DoubletsVsClickHouseBenchmarks
 
 ##  ClickHouse prerequsitions
-1. Install ClickHouse locally by usin [Install ClickHouse Documentation](https://clickhouse.com/docs/en/install)  
-2. Enable PostgresQL protocol to your server by using [PostgreSQL Interface Documentation](https://clickhouse.com/docs/en/interfaces/postgresql/)
-3. Create table `candles` by using this SQL statement:
-```sql
-CREATE TABLE candles (
-  starting_time TIMESTAMP NOT NULL,
-  opening_price DECIMAL(18, 8) NOT NULL,
-  closing_price DECIMAL(18, 8) NOT NULL,
-  highest_price DECIMAL(18, 8) NOT NULL,
-  lowest_price DECIMAL(18, 8) NOT NULL,
-  volume BIGINT NOT NULL,
-PRIMARY KEY (starting_time)
-) ENGINE = MergeTree()
-ORDER BY starting_time;
+1. Install ClickHouse locally by using [Install ClickHouse Documentation](https://clickhouse.com/docs/en/install)  
+2. Start clickhouse server by using
+```
+sudo clickhouse start
+```
+3. Create table `candles`
+  1. Execute `clickhouse-client` command line program
+  2. Write the password
+  3. Insert this query:
+  ```sql
+  CREATE TABLE candles (
+    starting_time TIMESTAMP NOT NULL,
+    opening_price DECIMAL(18, 8) NOT NULL,
+    closing_price DECIMAL(18, 8) NOT NULL,
+    highest_price DECIMAL(18, 8) NOT NULL,
+    lowest_price DECIMAL(18, 8) NOT NULL,
+    volume BIGINT NOT NULL,
+  PRIMARY KEY (starting_time)
+  ) ENGINE = MergeTree()
+  ORDER BY starting_time;
+  ```
+  4. Execute quit
+4. Run benchmarks
+```
+cd DoubletsVsClickHouseBenchmarks && dotnet run --configuration Release
 ```
 
 # Additional information
