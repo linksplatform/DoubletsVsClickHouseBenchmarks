@@ -32,18 +32,28 @@ public class ClickHouseAdapter : IBenchmarkable
     
 public async Task SaveCandles(IList<Candle> candles)
 {
-    var chunkedCandles = candles.Chunk(100000);
-
     using var bulkCopyInterface = new ClickHouseBulkCopy(ClickHouseConnection)
     {
         DestinationTableName = "candles"
     };
 
-    foreach (var candlesChunk in chunkedCandles)
+    foreach (var candle in candles)
     {
-        var candleRows = candlesChunk.Select((candle) => new object[] { candle.StartingTime, candle.OpeningPrice, candle.ClosingPrice, candle.LowestPrice, candle.HighestPrice, candle.Volume });
+        var candleRows = new List<Object[]> {new object[] { candle.StartingTime, candle.OpeningPrice, candle.ClosingPrice, candle.LowestPrice, candle.HighestPrice, candle.Volume }};
         await bulkCopyInterface.WriteToServerAsync(candleRows);
     }
+    // var chunkedCandles = candles.Chunk(100000);
+    //
+    // using var bulkCopyInterface = new ClickHouseBulkCopy(ClickHouseConnection)
+    // {
+    //     DestinationTableName = "candles"
+    // };
+    //
+    // foreach (var candlesChunk in chunkedCandles)
+    // {
+    //     var candleRows = candlesChunk.Select((candle) => new object[] { candle.StartingTime, candle.OpeningPrice, candle.ClosingPrice, candle.LowestPrice, candle.HighestPrice, candle.Volume });
+    //     await bulkCopyInterface.WriteToServerAsync(candleRows);
+    // }
 }
     
     public async Task<IList<Candle>> GetCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
@@ -55,7 +65,6 @@ WHERE
 	({minimumStartingTime.ToUnixTimeSeconds()} < starting_time)
 	AND
 	(starting_time < {maximumStartingTime.ToUnixTimeSeconds()})
-SETTINGS lock_acquire_timeout = 500
 ";
         using var reader = await ClickHouseConnection.ExecuteReaderAsync(sql);
         while (reader.Read())
@@ -74,8 +83,16 @@ SETTINGS lock_acquire_timeout = 500
         return candles;
     }
 
-    public async Task RemoveCandles()
+    public async Task RemoveCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
     {
-        await ClickHouseConnection.ExecuteStatementAsync("TRUNCATE TABLE candles SETTINGS lock_acquire_timeout = 500");
+        var candles = await GetCandles(minimumStartingTime, maximumStartingTime);
+        foreach (var candle in candles)
+        {
+            await ClickHouseConnection.ExecuteStatementAsync(@$"
+DELETE FROM candles
+WHERE 
+	starting_time == ${candle.StartingTime.ToUnixTimeSeconds()}
+");
+        }
     }
 }

@@ -243,12 +243,18 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
         return candleList;
     }
 
-    public async Task RemoveCandles()
+    public async Task RemoveCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
     {
         UnitedMemoryLinksStorage.Each(new Link<TLinkAddress>(UnitedMemoryLinksStorage.Constants.Any, CandleTypeLinkAddress, UnitedMemoryLinksStorage.Constants.Any), link =>
         {
             Link<TLinkAddress> linkStruct = new Link<TLinkAddress>(link);
-            UnitedMemoryLinksStorage.ClearGarbage(linkStruct.Index);
+            var candlePropertiesLinkAddresses = GetCandleProperties(linkStruct.Index);
+            var startingTimeLinkAddress = candlePropertiesLinkAddresses.First(link => UnitedMemoryLinksStorage.GetSource(link) == StartingTimeTypeLinkAddress);
+            var startingTime = GetStartingTime(startingTimeLinkAddress);
+            if (minimumStartingTime < startingTime && startingTime < maximumStartingTime)
+            {
+                UnitedMemoryLinksStorage.ClearGarbage(linkStruct.Index);
+            }
             return UnitedMemoryLinksStorage.Constants.Continue;
         });
     }

@@ -36,7 +36,7 @@ public class DoubletsVsClickHouseBenchmarks
     [Benchmark]
     public async Task LinksPlatformBenchmark()
     {
-        await Benchmarkable.RemoveCandles();
+        await Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
         await Benchmarkable.SaveCandles(Candles);
         await Benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime);
     }
