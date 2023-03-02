@@ -44,6 +44,7 @@ public class ClickHouseAdapter : IBenchmarkable
     
 public async Task SaveCandles(IList<Candle> candles)
 {
+    Console.WriteLine($"Saving {candles.Count} candles");
     using var bulkCopyInterface = new ClickHouseBulkCopy(ClickHouseConnection)
     {
         DestinationTableName = "candles"
@@ -53,7 +54,9 @@ public async Task SaveCandles(IList<Candle> candles)
     {
         var candleRows = new List<Object[]> {new object[] { candle.StartingTime, candle.OpeningPrice, candle.ClosingPrice, candle.LowestPrice, candle.HighestPrice, candle.Volume }};
         await bulkCopyInterface.WriteToServerAsync(candleRows);
+        Console.WriteLine($"Saving {candle}");
     }
+        Console.WriteLine($"Saved {candles.Count} candles");
     // var chunkedCandles = candles.Chunk(100000);
     //
     // using var bulkCopyInterface = new ClickHouseBulkCopy(ClickHouseConnection)
@@ -70,6 +73,7 @@ public async Task SaveCandles(IList<Candle> candles)
     
     public async Task<IList<Candle>> GetCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
     {
+        Console.WriteLine($"Getting candles");
         List<Candle> candles = new List<Candle>();
         string sql = @$"
 SELECT * FROM candles
@@ -92,11 +96,13 @@ WHERE
             };
             candles.Add(candle);
         }
+        Console.WriteLine($"Got {candles.Count} candles");
         return candles;
     }
 
     public async Task RemoveCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
     {
+        Console.WriteLine($"Removing candles");
         var candles = await GetCandles(minimumStartingTime, maximumStartingTime);
         foreach (var candle in candles)
         {
@@ -106,5 +112,6 @@ WHERE
 	starting_time == ${candle.StartingTime.ToUnixTimeSeconds()}
 ");
         }
+        Console.WriteLine($"Removed {candles.Count} candles");
     }
 }
