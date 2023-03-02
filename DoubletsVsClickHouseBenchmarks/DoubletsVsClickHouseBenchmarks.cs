@@ -34,45 +34,45 @@ public class DoubletsVsClickHouseBenchmarks
     }
     
     [IterationSetup(Target = nameof(DeleteBenchmark))]
-    public async Task DeleteIterationSetup()
+    public void DeleteIterationSetup()
     {
-        await Benchmarkable.SaveCandles(Candles);
+         Benchmarkable.SaveCandles(Candles).Wait();
     }
 
     [Benchmark]
-    public async Task DeleteBenchmark()
+    public void DeleteBenchmark()
     {
-        await Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
+         Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime).Wait();
     }
 
     [Benchmark]
-    public async Task SaveBenchmark()
+    public void SaveBenchmark()
     {
-        await Benchmarkable.SaveCandles(Candles);
+         Benchmarkable.SaveCandles(Candles).Wait();
     }
     
     [IterationCleanup(Target = nameof(SaveBenchmark))]
-    public async Task SaveIterationCleanup()
+    public void SaveIterationCleanup()
     {
-        await Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
+         Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime).Wait();
     }
 
     [IterationSetup(Target = nameof(GetBenchmark))]
-    public async Task GetIterationSetup()
+    public void GetIterationSetup()
     {
-        await Benchmarkable.SaveCandles(Candles);
+         Benchmarkable.SaveCandles(Candles).Wait();
     }
     
     [Benchmark]
-    public async Task GetBenchmark()
+    public void GetBenchmark()
     {
-        await Benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime);
+         Benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime).Wait();
     }
 
     [IterationCleanup(Target = nameof(GetBenchmark))]
-    public async Task GetIterationCleanup()
+    public void GetIterationCleanup()
     {
-        await Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
+         Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime).Wait();
     }
 
 }
