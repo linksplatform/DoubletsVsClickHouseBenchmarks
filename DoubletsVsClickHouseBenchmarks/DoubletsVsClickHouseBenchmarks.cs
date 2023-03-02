@@ -9,12 +9,11 @@ using Newtonsoft.Json;
 
 namespace Platform.Data.Doublets.Benchmarks;
 
-[SimpleJob]
+
 [MemoryDiagnoser]
-[SimpleJob(RunStrategy.Monitoring, launchCount: 1, warmupCount: 1, iterationCount: 1, invocationCount:1)]
+[ShortRunJob]
 public class DoubletsVsClickHouseBenchmarks
 {
-    // public static string ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName;
     public static string CsvFilePath = "/workspace/DoubletsVsClickHouseBenchmarks/MSFT.csv";
     public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
     public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
