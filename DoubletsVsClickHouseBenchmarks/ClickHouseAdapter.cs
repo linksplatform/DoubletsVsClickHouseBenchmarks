@@ -94,7 +94,7 @@ WHERE
         return candles;
     }
 
-    public async Task RemoveCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
+    public async Task DeleteCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
     {
         var candles = await GetCandles(minimumStartingTime, maximumStartingTime);
         foreach (var candle in candles)

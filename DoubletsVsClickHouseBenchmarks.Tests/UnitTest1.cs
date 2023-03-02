@@ -25,7 +25,7 @@ public class UnitTest1
     [MemberData(nameof(Benchmarkables))]
     public async void Test(IBenchmarkable benchmarkable)
     {
-        await benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
+        await benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime);
         await benchmarkable.SaveCandles(Candles);
         await benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime);
     }
