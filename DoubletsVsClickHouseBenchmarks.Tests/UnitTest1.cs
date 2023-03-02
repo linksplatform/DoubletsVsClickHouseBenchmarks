@@ -8,6 +8,11 @@ public class UnitTest1
     public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
     public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
     public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
+    public IList<Candle> Candles = new List<Candle>();
+    public UnitTest1()
+    {
+        Candles = new CsvCandleParser().Parse(CsvFilePath);
+    }
     
     public static IEnumerable<object[]> Benchmarkables =>
         new List<IBenchmarkable[]>
@@ -20,9 +25,8 @@ public class UnitTest1
     [MemberData(nameof(Benchmarkables))]
     public async void Test(IBenchmarkable benchmarkable)
     {
-        var candles = new CsvCandleParser().Parse(CsvFilePath);
-        await benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
-        await benchmarkable.SaveCandles(candles);
+        await benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime);
+        await benchmarkable.SaveCandles(Candles);
         await benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime);
     }
 }

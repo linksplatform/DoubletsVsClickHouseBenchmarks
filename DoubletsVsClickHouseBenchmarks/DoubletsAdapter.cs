@@ -243,7 +243,7 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
         return candleList;
     }
 
-    public async Task RemoveCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
+    public async Task DeleteCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
     {
         UnitedMemoryLinksStorage.Each(new Link<TLinkAddress>(UnitedMemoryLinksStorage.Constants.Any, CandleTypeLinkAddress, UnitedMemoryLinksStorage.Constants.Any), link =>
         {

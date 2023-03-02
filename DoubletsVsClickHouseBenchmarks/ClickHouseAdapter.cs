@@ -99,7 +99,7 @@ WHERE
         return candles;
     }
 
-    public async Task RemoveCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
+    public async Task DeleteCandles(DateTimeOffset minimumStartingTime, DateTimeOffset maximumStartingTime)
     {
         Console.WriteLine($"Removing candles");
         var candles = await GetCandles(minimumStartingTime, maximumStartingTime);

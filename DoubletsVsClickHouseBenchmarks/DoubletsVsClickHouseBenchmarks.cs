@@ -42,7 +42,7 @@ public class DoubletsVsClickHouseBenchmarks
     [Benchmark]
     public void DeleteBenchmark()
     {
-         Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime).Wait();
+         Benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime).Wait();
     }
 
     [Benchmark]
@@ -54,7 +54,7 @@ public class DoubletsVsClickHouseBenchmarks
     [IterationCleanup(Target = nameof(SaveBenchmark))]
     public void SaveIterationCleanup()
     {
-         Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime).Wait();
+         Benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime).Wait();
     }
 
     [IterationSetup(Target = nameof(GetBenchmark))]
@@ -72,7 +72,7 @@ public class DoubletsVsClickHouseBenchmarks
     [IterationCleanup(Target = nameof(GetBenchmark))]
     public void GetIterationCleanup()
     {
-         Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime).Wait();
+         Benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime).Wait();
     }
 
 }
