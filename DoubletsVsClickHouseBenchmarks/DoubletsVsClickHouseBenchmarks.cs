@@ -1,5 +1,6 @@
 using System.Globalization;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 using ClickHouse.Client.ADO;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -10,6 +11,7 @@ namespace Platform.Data.Doublets.Benchmarks;
 
 [SimpleJob]
 [MemoryDiagnoser]
+[SimpleJob(RunStrategy.Monitoring, launchCount: 1, warmupCount: 1, iterationCount: 1, invocationCount:1)]
 public class DoubletsVsClickHouseBenchmarks
 {
     // public static string ProjectDirectory = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName;
