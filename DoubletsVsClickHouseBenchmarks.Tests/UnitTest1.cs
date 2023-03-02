@@ -4,13 +4,15 @@ namespace DoubletsVsClickHouseBenchmarks.Tests;
 
 public class UnitTest1
 {
-    public string CsvFilePath = "/home/freephoenix888/Programming/linksplatform/DoubletsVsClickHouseBenchmarks/DoubletsVsClickHouseBenchmarks/MSFT.csv";
+    public static DirectoryInfo RootDirectoryInfo = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent;
+    public static string CsvFilePath = Path.Join(RootDirectoryInfo.FullName, "MSFT.csv");
     public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
     public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
     public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
     public IList<Candle> Candles = new List<Candle>();
     public UnitTest1()
     {
+        Console.WriteLine(CsvFilePath);
         Candles = new CsvCandleParser().Parse(CsvFilePath);
     }
     
