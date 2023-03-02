@@ -22,7 +22,6 @@ namespace DoubletsVsClickHouseBenchmarks;
 
 public class ClickHouseAdapter : IBenchmarkable
 {
-    public Uri restApiUri = new Uri("http://localhost:8123");
     public ClickHouseConnection ClickHouseConnection;
     
     public ClickHouseAdapter(ClickHouseConnection сlickHouseConnection)
