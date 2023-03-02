@@ -18,7 +18,7 @@ public class DoubletsVsClickHouseBenchmarks
     public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
     public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
     public List<Candle> Candles;
-
+    
     public IEnumerable<IBenchmarkable> Benchmarkables { get; } = new IBenchmarkable[]
     {
         new ClickHouseAdapter(ClickHouseConnection),
@@ -33,11 +33,46 @@ public class DoubletsVsClickHouseBenchmarks
         Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
     }
     
+    [IterationSetup(Target = nameof(DeleteBenchmark))]
+    public async Task DeleteIterationSetup()
+    {
+        await Benchmarkable.SaveCandles(Candles);
+    }
+
     [Benchmark]
-    public async Task LinksPlatformBenchmark()
+    public async Task DeleteBenchmark()
     {
         await Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
+    }
+
+    [Benchmark]
+    public async Task SaveBenchmark()
+    {
         await Benchmarkable.SaveCandles(Candles);
+    }
+    
+    [IterationCleanup(Target = nameof(SaveBenchmark))]
+    public async Task SaveIterationCleanup()
+    {
+        await Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
+    }
+
+    [IterationSetup(Target = nameof(GetBenchmark))]
+    public async Task GetIterationSetup()
+    {
+        await Benchmarkable.SaveCandles(Candles);
+    }
+    
+    [Benchmark]
+    public async Task GetBenchmark()
+    {
         await Benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime);
     }
+
+    [IterationCleanup(Target = nameof(GetBenchmark))]
+    public async Task GetIterationCleanup()
+    {
+        await Benchmarkable.RemoveCandles(MinimumStartingTime, MaximumStartingTime);
+    }
+
 }
