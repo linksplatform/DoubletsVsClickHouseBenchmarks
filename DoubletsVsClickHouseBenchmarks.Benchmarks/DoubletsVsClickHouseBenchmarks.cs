@@ -18,7 +18,7 @@ public class DoubletsVsClickHouseBenchmarks
      public static DirectoryInfo projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent;
      public static DirectoryInfo solutionDirectory = projectDirectory.Parent;
     public static string CsvFilePath = Path.Join(solutionDirectory.FullName, "MSFT.csv");
-    public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
+    public static ClickHouseConnection ClickHouseConnection;
     public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
     public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
     public List<Candle> Candles;
