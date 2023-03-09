@@ -19,8 +19,8 @@ public class DoubletsVsClickHouseBenchmarks
      public static DirectoryInfo solutionDirectory = projectDirectory.Parent;
     public static string CsvFilePath = Path.Join(solutionDirectory.FullName, "MSFT.csv");
     public static ClickHouseConnection ClickHouseConnection;
-    public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
-    public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
+    public DateTimeOffset MaximumStartingTime;
+    public DateTimeOffset MinimumStartingTime;
     public List<Candle> Candles;
     
     [GlobalSetup]
@@ -33,6 +33,19 @@ public class DoubletsVsClickHouseBenchmarks
          }
          ClickHouseConnection = new ClickHouseConnection(connectionString);
          Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
+         System.Random random = new System.Random();
+         var randomStartingTime0 = random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
+         var randomStartingTime1 = random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
+         if (randomStartingTime0 > randomStartingTime1)
+         {
+              MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime0);
+              MinimumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime1);
+         }
+         else
+         {
+              MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime1);
+              MinimumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime0);
+         }
     }
     
     public IEnumerable<IBenchmarkable> Benchmarkables { get; } = new IBenchmarkable[]
