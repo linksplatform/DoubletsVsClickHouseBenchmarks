@@ -1,16 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+      <Reference Include="ClickHouse.Client">
+        <HintPath>..\..\..\..\..\.nuget\packages\clickhouse.client\6.4.0\lib\net5.0\ClickHouse.Client.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
         <PackageReference Include="ClickHouse.Client" Version="6.4.0" />
-        <PackageReference Include="CommandLineParser" Version="2.9.1" />
         <PackageReference Include="CsvHelper" Version="30.0.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Platform.Data.Doublets.Sequences" Version="0.5.1" />

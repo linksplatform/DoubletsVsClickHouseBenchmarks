@@ -14,7 +14,7 @@ namespace Platform.Data.Doublets.Benchmarks;
 [ShortRunJob]
 public class DoubletsVsClickHouseBenchmarks
 {
-    public static string CsvFilePath = "/workspace/DoubletsVsClickHouseBenchmarks/MSFT.csv";
+    public static string CsvFilePath = "/workspace/DoubletsVsClickHouseBenchmarks.Benchmarks/MSFT.csv";
     public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
     public static DateTimeOffset MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.Now.ToUnixTimeSeconds());
     public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
