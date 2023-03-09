@@ -23,6 +23,18 @@ public class DoubletsVsClickHouseBenchmarks
     public static DateTimeOffset MinimumStartingTime = DateTimeOffset.Now.AddMonths(-1);
     public List<Candle> Candles;
     
+    [GlobalSetup]
+    public void GlobalSetup()
+    {
+         var connectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection));
+         if (connectionString == null)
+         {
+              throw new Exception("ClickHouseConnection environment variable must be set");
+         }
+         ClickHouseConnection = new ClickHouseConnection(connectionString);
+         Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
+    }
+    
     public IEnumerable<IBenchmarkable> Benchmarkables { get; } = new IBenchmarkable[]
     {
         new ClickHouseAdapter(ClickHouseConnection),
@@ -31,12 +43,6 @@ public class DoubletsVsClickHouseBenchmarks
 
     [ParamsSource(nameof(Benchmarkables))] public IBenchmarkable Benchmarkable { get; set; }
 
-    [GlobalSetup]
-    public void GlobalSetup()
-    {
-        Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
-    }
-    
     [IterationSetup(Target = nameof(DeleteBenchmark))]
     public void DeleteIterationSetup()
     {
