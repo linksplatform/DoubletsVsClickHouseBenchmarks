@@ -19,10 +19,9 @@ public class DoubletsVsClickHouseBenchmarks
      public static DirectoryInfo solutionDirectory = projectDirectory.Parent;
     public static string CsvFilePath = Path.Join(solutionDirectory.FullName, "MSFT.csv");
     public static ClickHouseConnection ClickHouseConnection;
-    public DateTimeOffset MaximumStartingTime;
-    public DateTimeOffset MinimumStartingTime;
     public List<Candle> Candles;
-    
+    public static System.Random Random;
+
     [GlobalSetup]
     public void GlobalSetup()
     {
@@ -33,19 +32,7 @@ public class DoubletsVsClickHouseBenchmarks
          }
          ClickHouseConnection = new ClickHouseConnection(connectionString);
          Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
-         System.Random random = new System.Random();
-         var randomStartingTime0 = random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
-         var randomStartingTime1 = random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
-         if (randomStartingTime0 > randomStartingTime1)
-         {
-              MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime0);
-              MinimumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime1);
-         }
-         else
-         {
-              MaximumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime1);
-              MinimumStartingTime = DateTimeOffset.FromUnixTimeSeconds(randomStartingTime0);
-         }
+         Random = new System.Random();
     }
     
     public IEnumerable<IBenchmarkable> Benchmarkables { get; } = new IBenchmarkable[]
@@ -54,7 +41,27 @@ public class DoubletsVsClickHouseBenchmarks
         new DoubletsAdapter<UInt64>(),
     };
 
+    public (DateTimeOffset, DateTimeOffset) GenerateRandomMinAndMaxStartingTimes()
+    {
+         var randomStartingTime0 = Random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
+         var randomStartingTime1 = Random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
+         if (randomStartingTime0 > randomStartingTime1)
+         {
+              return (DateTimeOffset.FromUnixTimeSeconds(randomStartingTime0), DateTimeOffset.FromUnixTimeSeconds(randomStartingTime1));
+         }
+         else
+         {
+              return (DateTimeOffset.FromUnixTimeSeconds(randomStartingTime1), DateTimeOffset.FromUnixTimeSeconds(randomStartingTime0));
+         }
+    }
+
     [ParamsSource(nameof(Benchmarkables))] public IBenchmarkable Benchmarkable { get; set; }
+
+    [IterationSetup]
+    public void IterationSetup()
+    {
+
+    }
 
     [IterationSetup(Target = nameof(DeleteBenchmark))]
     public void DeleteIterationSetup()
@@ -65,7 +72,8 @@ public class DoubletsVsClickHouseBenchmarks
     [Benchmark]
     public void DeleteBenchmark()
     {
-         Benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime).Wait();
+         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
+         Benchmarkable.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
     [Benchmark]
@@ -77,7 +85,8 @@ public class DoubletsVsClickHouseBenchmarks
     [IterationCleanup(Target = nameof(SaveBenchmark))]
     public void SaveIterationCleanup()
     {
-         Benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime).Wait();
+         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
+         Benchmarkable.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
     [IterationSetup(Target = nameof(GetBenchmark))]
@@ -89,13 +98,15 @@ public class DoubletsVsClickHouseBenchmarks
     [Benchmark]
     public void GetBenchmark()
     {
-         Benchmarkable.GetCandles(MinimumStartingTime, MaximumStartingTime).Wait();
+         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
+         Benchmarkable.GetCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
     [IterationCleanup(Target = nameof(GetBenchmark))]
     public void GetIterationCleanup()
     {
-         Benchmarkable.DeleteCandles(MinimumStartingTime, MaximumStartingTime).Wait();
+         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
+         Benchmarkable.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
 }
