@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  install_clickhouse:
+  setup_clickhouse:
     runs-on: ubuntu-latest
     steps:
-      - name: Install ClickHouse
+      - name: Setup Debian Repository For ClickHouse
         run: |
           sudo apt-get install -y apt-transport-https ca-certificates dirmngr
           sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 8919F6BD2B48D754
@@ -15,5 +15,18 @@ jobs:
           echo "deb https://packages.clickhouse.com/deb stable main" | sudo tee \
               /etc/apt/sources.list.d/clickhouse.list
           sudo apt-get update
-          sudo apt-get install -y clickhouse-client
+      - name: Install ClickHouse Server
+        run: |
           sudo apt-get install -y clickhouse-server
+      - name: Run ClickHouse Server
+        run: |
+          sudo service clickhouse-server start
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - run: |
+          dotnet run --project ./DoubletsVsClickHouseBenchmarks --configuration Release
