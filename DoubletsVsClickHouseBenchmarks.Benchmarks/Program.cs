@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Running;
+﻿using System.Reflection;
+using BenchmarkDotNet.Running;
 
 namespace DoubletsVsClickHouseBenchmarks
 {
@@ -14,10 +15,14 @@ namespace DoubletsVsClickHouseBenchmarks
     
     class Program
     {
+        public static string entryAssemblyPath = Assembly.GetEntryAssembly().Location;
+        public static DirectoryInfo projectDirectory = Directory.GetParent(entryAssemblyPath).Parent.Parent;
+        public static DirectoryInfo solutionDirectory = projectDirectory.Parent;
         static void Main(string[] args)
         {
+            Console.WriteLine(entryAssemblyPath);
             // var a = Parser.Default.ParseArguments<Options>(args);
-            var summary = BenchmarkRunner.Run<DoubletsVsClickHouseBenchmarks>();   
+            // var summary = BenchmarkRunner.Run<DoubletsVsClickHouseBenchmarks>();   
         }
     }
 }
