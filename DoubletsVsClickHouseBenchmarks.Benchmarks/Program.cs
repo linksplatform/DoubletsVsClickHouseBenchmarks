@@ -20,9 +20,8 @@ namespace DoubletsVsClickHouseBenchmarks
         public static DirectoryInfo solutionDirectory = projectDirectory.Parent;
         static void Main(string[] args)
         {
-            Console.WriteLine(entryAssemblyPath);
             // var a = Parser.Default.ParseArguments<Options>(args);
-            // var summary = BenchmarkRunner.Run<DoubletsVsClickHouseBenchmarks>();   
+            var summary = BenchmarkRunner.Run<DoubletsVsClickHouseBenchmarks>();   
         }
     }
 }
