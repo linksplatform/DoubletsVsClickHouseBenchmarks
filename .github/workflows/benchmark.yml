@@ -29,4 +29,6 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - run: |
+          ls
+          echo "PWD: $(echo $PWD)"
           dotnet run --project ./DoubletsVsClickHouseBenchmarks.Benchmarks/DoubletsVsClickHouseBenchmarks.Benchmarks.csproj --configuration Release
