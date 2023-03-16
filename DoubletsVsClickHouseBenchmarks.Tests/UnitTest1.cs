@@ -1,4 +1,5 @@
 using ClickHouse.Client.ADO;
+using DoubletsVsClickHouseBenchmarks.Library;
 
 namespace DoubletsVsClickHouseBenchmarks.Tests;
 

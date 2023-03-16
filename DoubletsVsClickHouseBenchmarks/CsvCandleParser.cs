@@ -2,7 +2,7 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace DoubletsVsClickHouseBenchmarks;
+namespace DoubletsVsClickHouseBenchmarks.Library;
 
 public class CsvCandleParser
 {

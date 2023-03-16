@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Numerics;
 using Platform.Collections.Stacks;
 using Platform.Converters;
@@ -16,7 +15,7 @@ using Platform.Data.Numbers.Raw;
 using Platform.IO;
 using Platform.Memory;
 
-namespace DoubletsVsClickHouseBenchmarks;
+namespace DoubletsVsClickHouseBenchmarks.Library;
 
 public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress : struct, IUnsignedNumber<TLinkAddress>, IShiftOperators<TLinkAddress,int,TLinkAddress>, IBitwiseOperators<TLinkAddress,TLinkAddress,TLinkAddress>, IMinMaxValue<TLinkAddress>, IComparisonOperators<TLinkAddress, TLinkAddress, bool>
 {

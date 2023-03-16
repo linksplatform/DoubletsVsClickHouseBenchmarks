@@ -1,24 +1,8 @@
-using System.Collections;
-using System.Numerics;
 using ClickHouse.Client.ADO;
 using ClickHouse.Client.Copy;
 using ClickHouse.Client.Utility;
-using Platform.Collections.Stacks;
-using Platform.Converters;
-using Platform.Data;
-using Platform.Data.Doublets;
-using Platform.Data.Doublets.CriterionMatchers;
-using Platform.Data.Doublets.Memory;
-using Platform.Data.Doublets.Memory.United.Generic;
-using Platform.Data.Doublets.Sequences.Converters;
-using Platform.Data.Doublets.Sequences.Numbers.Raw;
-using Platform.Data.Doublets.Sequences.Unicode;
-using Platform.Data.Doublets.Sequences.Walkers;
-using Platform.Data.Numbers.Raw;
-using Platform.IO;
-using Platform.Memory;
 
-namespace DoubletsVsClickHouseBenchmarks;
+namespace DoubletsVsClickHouseBenchmarks.Library;
 
 public class ClickHouseAdapter : IBenchmarkable
 {

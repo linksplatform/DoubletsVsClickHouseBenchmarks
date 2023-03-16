@@ -1,13 +1,8 @@
-using System.Globalization;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Engines;
 using ClickHouse.Client.ADO;
-using CsvHelper;
-using CsvHelper.Configuration;
-using DoubletsVsClickHouseBenchmarks;
-using Newtonsoft.Json;
+using DoubletsVsClickHouseBenchmarks.Library;
 
-namespace Platform.Data.Doublets.Benchmarks;
+namespace DoubletsVsClickHouseBenchmarks;
 
 
 [MemoryDiagnoser]
