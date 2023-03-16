@@ -1,3 +1,4 @@
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using ClickHouse.Client.ADO;
 using DoubletsVsClickHouseBenchmarks.Library;
@@ -9,8 +10,8 @@ namespace DoubletsVsClickHouseBenchmarks;
 [ShortRunJob]
 public class DoubletsVsClickHouseBenchmarks
 {
-     public static string workingDirectory = Environment.CurrentDirectory;
-     public static DirectoryInfo projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent;
+     public static string entryAssemblyPath = Assembly.GetEntryAssembly().Location;
+     public static DirectoryInfo projectDirectory = Directory.GetParent(entryAssemblyPath).Parent.Parent;
      public static DirectoryInfo solutionDirectory = projectDirectory.Parent;
     public static string CsvFilePath = Path.Join(solutionDirectory.FullName, "MSFT.csv");
     public static ClickHouseConnection ClickHouseConnection;
