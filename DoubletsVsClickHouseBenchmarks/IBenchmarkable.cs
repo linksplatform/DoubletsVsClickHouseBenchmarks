@@ -1,4 +1,4 @@
-namespace DoubletsVsClickHouseBenchmarks;
+namespace DoubletsVsClickHouseBenchmarks.Library;
 
 public interface IBenchmarkable
 {
