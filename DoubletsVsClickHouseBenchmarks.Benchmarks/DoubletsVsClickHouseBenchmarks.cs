@@ -10,10 +10,7 @@ namespace DoubletsVsClickHouseBenchmarks;
 [ShortRunJob]
 public class DoubletsVsClickHouseBenchmarks
 {
-     public static string entryAssemblyPath = Assembly.GetEntryAssembly().Location;
-     public static DirectoryInfo projectDirectory = Directory.GetParent(entryAssemblyPath).Parent.Parent;
-     public static DirectoryInfo solutionDirectory = projectDirectory.Parent;
-    public static string CsvFilePath = Path.Join(solutionDirectory.FullName, "MSFT.csv");
+    public static string CsvFilePath = Environment.GetEnvironmentVariable(nameof(CsvFilePath));
     public static ClickHouseConnection ClickHouseConnection;
     public List<Candle> Candles;
     public static System.Random Random;
