@@ -6,12 +6,6 @@
         <Nullable>enable</Nullable>
         <RootNamespace>DoubletsVsClickHouseBenchmarks.Library</RootNamespace>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Reference Include="ClickHouse.Client">
-        <HintPath>..\..\..\..\..\.nuget\packages\clickhouse.client\6.4.0\lib\net5.0\ClickHouse.Client.dll</HintPath>
-      </Reference>
-    </ItemGroup>
     
     <ItemGroup>
         <PackageReference Include="ClickHouse.Client" Version="6.4.0" />
