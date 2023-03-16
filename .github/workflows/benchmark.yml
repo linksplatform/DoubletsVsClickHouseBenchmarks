@@ -23,6 +23,7 @@ jobs:
           sudo service clickhouse-server start
   benchmark:
     runs-on: ubuntu-latest
+    needs: [setup_clickhouse]
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
