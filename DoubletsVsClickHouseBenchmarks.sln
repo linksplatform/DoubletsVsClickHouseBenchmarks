@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubletsVsClickHouseBenchma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubletsVsClickHouseBenchmarks.Tests", "DoubletsVsClickHouseBenchmarks.Tests\DoubletsVsClickHouseBenchmarks.Tests.csproj", "{4E185901-6DA7-447D-954C-D3527F0B91F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubletsVsClickHouseBenchmarks.Library", "DoubletsVsClickHouseBenchmarks.Library\DoubletsVsClickHouseBenchmarks.Library.csproj", "{27962BE4-0564-40AD-BD88-CACD437B6DC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubletsVsClickHouseBenchmarks", "DoubletsVsClickHouseBenchmarks\DoubletsVsClickHouseBenchmarks.csproj", "{27962BE4-0564-40AD-BD88-CACD437B6DC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

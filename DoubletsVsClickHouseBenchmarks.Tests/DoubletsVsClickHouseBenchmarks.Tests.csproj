@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DoubletsVsClickHouseBenchmarks.Library\DoubletsVsClickHouseBenchmarks.Library.csproj" />
+      <ProjectReference Include="..\DoubletsVsClickHouseBenchmarks\DoubletsVsClickHouseBenchmarks.csproj" />
     </ItemGroup>
 
 
