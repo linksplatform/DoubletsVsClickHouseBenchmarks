@@ -19,18 +19,21 @@ public class DoubletsVsClickHouseBenchmarks
     static public void GlobalSetup()
     {
          var connectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection));
+         Console.WriteLine($"{nameof(ClickHouseConnection)}: {ClickHouseConnection}");
          if (connectionString == null)
          {
               throw new Exception("ClickHouseConnection environment variable must be set");
          }
          ClickHouseConnection = new ClickHouseConnection(connectionString);
          Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
+         Console.WriteLine($"{nameof(Candles)}: {Candles}");
          Random = new System.Random();
          Benchmarkables = new IBenchmarkable[]
          {
               new ClickHouseAdapter(ClickHouseConnection),
               new DoubletsAdapter<UInt64>(),
          };
+         Console.WriteLine($"{nameof(Benchmarkables)}: {Benchmarkables}");
     }
     
     public static IEnumerable<IBenchmarkable> Benchmarkables { get; set; }
