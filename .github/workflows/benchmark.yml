@@ -29,6 +29,6 @@ jobs:
       - name: Benchmark
         env: 
           ClickHouseConnection: 'Host=localhost;Protocol=http;Port=8123;Username=default;Timeout=500'
-          CsvFilePath: "${PWD}/MSFT.csv"
+          CsvFilePath: "${{github.workspace}}/MSFT.csv"
         run: |
           dotnet run --project ./DoubletsVsClickHouseBenchmarks.Benchmarks/DoubletsVsClickHouseBenchmarks.Benchmarks.csproj --configuration Release
