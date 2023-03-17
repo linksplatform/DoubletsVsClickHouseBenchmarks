@@ -15,6 +15,11 @@ public class DoubletsVsClickHouseBenchmarks
     public static List<Candle> Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
     public static System.Random Random = new System.Random();
 
+    static DoubletsVsClickHouseBenchmarks()
+    {
+         Console.WriteLine("Static constructor");
+    }
+    
     public static IEnumerable<IBenchmarkable> Benchmarkables() => new List<IBenchmarkable>()
     {
          new ClickHouseAdapter(ClickHouseConnection),
