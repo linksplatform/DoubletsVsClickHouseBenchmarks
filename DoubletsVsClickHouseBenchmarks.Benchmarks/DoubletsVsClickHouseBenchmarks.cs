@@ -11,24 +11,9 @@ namespace DoubletsVsClickHouseBenchmarks;
 public class DoubletsVsClickHouseBenchmarks
 {
     public static string CsvFilePath = Environment.GetEnvironmentVariable(nameof(CsvFilePath));
-    public static ClickHouseConnection ClickHouseConnection;
-    public static List<Candle> Candles;
-    public static System.Random Random;
-
-    [GlobalSetup]
-    public void GlobalSetup()
-    {
-         var connectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection));
-         Console.WriteLine($"{nameof(ClickHouseConnection)}: {ClickHouseConnection}");
-         if (connectionString == null)
-         {
-              throw new Exception("ClickHouseConnection environment variable must be set");
-         }
-         ClickHouseConnection = new ClickHouseConnection(connectionString);
-         Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
-         Console.WriteLine($"{nameof(Candles)}: {Candles}");
-         Random = new System.Random();
-    }
+    public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
+    public static List<Candle> Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
+    public static System.Random Random = new System.Random();
 
     public static IEnumerable<IBenchmarkable> Benchmarkables() => new List<IBenchmarkable>()
     {
