@@ -28,15 +28,13 @@ public class DoubletsVsClickHouseBenchmarks
          Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
          Console.WriteLine($"{nameof(Candles)}: {Candles}");
          Random = new System.Random();
-         Benchmarkables = new IBenchmarkable[]
-         {
-              new ClickHouseAdapter(ClickHouseConnection),
-              new DoubletsAdapter<UInt64>(),
-         };
-         Console.WriteLine($"{nameof(Benchmarkables)}: {Benchmarkables}");
     }
     
-    public static IEnumerable<IBenchmarkable> Benchmarkables { get; set; }
+    public IEnumerable<IBenchmarkable> Benchmarkables { get;} = new IBenchmarkable[]
+    {
+         new ClickHouseAdapter(ClickHouseConnection),
+         new DoubletsAdapter<UInt64>(),
+    };
 
     public (DateTimeOffset, DateTimeOffset) GenerateRandomMinAndMaxStartingTimes()
     {
