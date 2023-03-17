@@ -10,16 +10,20 @@ namespace DoubletsVsClickHouseBenchmarks;
 [ShortRunJob]
 public class DoubletsVsClickHouseBenchmarks
 {
-    public static string CsvFilePath = Environment.GetEnvironmentVariable(nameof(CsvFilePath));
-    public static ClickHouseConnection ClickHouseConnection = new ClickHouseConnection(Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)));
-    public static List<Candle> Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
-    public static System.Random Random = new System.Random();
+    public static string CsvFilePath;
+    public static ClickHouseConnection ClickHouseConnection;
+    public static List<Candle> Candles;
+    public static System.Random Random;
 
     static DoubletsVsClickHouseBenchmarks()
     {
-         Console.WriteLine("Static constructor");
+         CsvFilePath = Environment.GetEnvironmentVariable(nameof(CsvFilePath)) ?? throw new Exception($"{nameof(CsvFilePath)} environment variable must be set");
+         Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
+         Random = new System.Random();
+         var clickHouseConnectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)) ?? throw new Exception($"{nameof(ClickHouseConnection)} environment variable must be set"); 
+         ClickHouseConnection = new ClickHouseConnection(clickHouseConnectionString);
     }
-    
+
     public static IEnumerable<IBenchmarkable> Benchmarkables() => new List<IBenchmarkable>()
     {
          new ClickHouseAdapter(ClickHouseConnection),
