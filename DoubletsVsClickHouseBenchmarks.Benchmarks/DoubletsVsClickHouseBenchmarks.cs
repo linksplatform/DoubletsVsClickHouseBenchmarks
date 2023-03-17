@@ -12,11 +12,11 @@ public class DoubletsVsClickHouseBenchmarks
 {
     public static string CsvFilePath = Environment.GetEnvironmentVariable(nameof(CsvFilePath));
     public static ClickHouseConnection ClickHouseConnection;
-    public List<Candle> Candles;
+    public static List<Candle> Candles;
     public static System.Random Random;
 
     [GlobalSetup]
-    public void GlobalSetup()
+    static public void GlobalSetup()
     {
          var connectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection));
          if (connectionString == null)
@@ -33,7 +33,7 @@ public class DoubletsVsClickHouseBenchmarks
          };
     }
     
-    public IEnumerable<IBenchmarkable> Benchmarkables { get; set; }
+    public static IEnumerable<IBenchmarkable> Benchmarkables { get; set; }
 
     public (DateTimeOffset, DateTimeOffset) GenerateRandomMinAndMaxStartingTimes()
     {
@@ -49,7 +49,8 @@ public class DoubletsVsClickHouseBenchmarks
          }
     }
 
-    [ParamsSource(nameof(Benchmarkables))] public IBenchmarkable Benchmarkable { get; set; }
+    [ParamsSource(nameof(Benchmarkables))]
+    public IBenchmarkable Benchmarkable { get; set; }
 
     [IterationSetup]
     public void IterationSetup()
