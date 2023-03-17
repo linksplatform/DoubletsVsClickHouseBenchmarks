@@ -16,7 +16,7 @@ public class DoubletsVsClickHouseBenchmarks
     public static System.Random Random;
 
     [GlobalSetup]
-    static public void GlobalSetup()
+    public void GlobalSetup()
     {
          var connectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection));
          Console.WriteLine($"{nameof(ClickHouseConnection)}: {ClickHouseConnection}");
@@ -28,13 +28,14 @@ public class DoubletsVsClickHouseBenchmarks
          Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
          Console.WriteLine($"{nameof(Candles)}: {Candles}");
          Random = new System.Random();
+         Benchmarkables = new IBenchmarkable[]
+         {
+              new ClickHouseAdapter(ClickHouseConnection),
+              new DoubletsAdapter<UInt64>(),
+         };
     }
     
-    public IEnumerable<IBenchmarkable> Benchmarkables { get;} = new IBenchmarkable[]
-    {
-         new ClickHouseAdapter(ClickHouseConnection),
-         new DoubletsAdapter<UInt64>(),
-    };
+    public IEnumerable<IBenchmarkable> Benchmarkables { get; set; }
 
     public (DateTimeOffset, DateTimeOffset) GenerateRandomMinAndMaxStartingTimes()
     {
