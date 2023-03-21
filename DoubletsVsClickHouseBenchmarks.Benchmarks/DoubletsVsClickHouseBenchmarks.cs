@@ -1,15 +1,23 @@
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using ClickHouse.Client.ADO;
 using DoubletsVsClickHouseBenchmarks.Library;
 
 namespace DoubletsVsClickHouseBenchmarks;
 
-
+[Config(typeof(Config))]
 [MemoryDiagnoser]
-[ShortRunJob]
 public class DoubletsVsClickHouseBenchmarks
 {
+     private class Config : ManualConfig
+     {
+          public Config()
+          {
+               Add(Job.ShortRun.WithWarmupCount(1).WithLaunchCount(1).WithIterationCount(1));
+          }
+     }
     public static string CsvFilePath;
     public static ClickHouseConnection ClickHouseConnection;
     public static List<Candle> Candles;
