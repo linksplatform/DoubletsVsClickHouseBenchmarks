@@ -1,39 +1,42 @@
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
 using ClickHouse.Client.ADO;
 using DoubletsVsClickHouseBenchmarks.Library;
 
 namespace DoubletsVsClickHouseBenchmarks;
 
-
+[Config(typeof(Config))]
 [MemoryDiagnoser]
-[ShortRunJob]
 public class DoubletsVsClickHouseBenchmarks
 {
-    public static string CsvFilePath = Environment.GetEnvironmentVariable(nameof(CsvFilePath));
+     private class Config : ManualConfig
+     {
+          public Config()
+          {
+               Add(Job.ShortRun.WithWarmupCount(1).WithLaunchCount(1).WithIterationCount(1));
+          }
+     }
+    public static string CsvFilePath;
     public static ClickHouseConnection ClickHouseConnection;
-    public List<Candle> Candles;
+    public static List<Candle> Candles;
     public static System.Random Random;
 
-    [GlobalSetup]
-    public void GlobalSetup()
+    static DoubletsVsClickHouseBenchmarks()
     {
-         var connectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection));
-         if (connectionString == null)
-         {
-              throw new Exception("ClickHouseConnection environment variable must be set");
-         }
-         ClickHouseConnection = new ClickHouseConnection(connectionString);
+         CsvFilePath = Environment.GetEnvironmentVariable(nameof(CsvFilePath)) ?? throw new Exception($"{nameof(CsvFilePath)} environment variable must be set");
          Candles = new CsvCandleParser().Parse(CsvFilePath).ToList();
          Random = new System.Random();
+         var clickHouseConnectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)) ?? throw new Exception($"{nameof(ClickHouseConnection)} environment variable must be set"); 
+         ClickHouseConnection = new ClickHouseConnection(clickHouseConnectionString);
     }
-    
-    public IEnumerable<IBenchmarkable> Benchmarkables { get; } = new IBenchmarkable[]
-    {
-        new ClickHouseAdapter(ClickHouseConnection),
-        new DoubletsAdapter<UInt64>(),
-    };
 
+    public static IEnumerable<IBenchmarkable> Benchmarkables() => new List<IBenchmarkable>()
+    {
+         new ClickHouseAdapter(ClickHouseConnection),
+         new DoubletsAdapter<UInt64>(),
+    };
     public (DateTimeOffset, DateTimeOffset) GenerateRandomMinAndMaxStartingTimes()
     {
          var randomStartingTime0 = Random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
@@ -48,7 +51,8 @@ public class DoubletsVsClickHouseBenchmarks
          }
     }
 
-    [ParamsSource(nameof(Benchmarkables))] public IBenchmarkable Benchmarkable { get; set; }
+    [ParamsSource(nameof(Benchmarkables))]
+    public IBenchmarkable Benchmarkable { get; set; }
 
     [IterationSetup]
     public void IterationSetup()

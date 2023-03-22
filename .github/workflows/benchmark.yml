@@ -4,9 +4,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup_clickhouse:
+  benchmark:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
       - name: Setup Debian Repository For ClickHouse
         run: |
           sudo apt-get install -y apt-transport-https ca-certificates dirmngr
@@ -21,18 +26,9 @@ jobs:
       - name: Run ClickHouse Server
         run: |
           sudo service clickhouse-server start
-  benchmark:
-    runs-on: ubuntu-latest
-    needs: [setup_clickhouse]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 6.0.x
       - name: Benchmark
         env: 
           ClickHouseConnection: 'Host=localhost;Protocol=http;Port=8123;Username=default;Timeout=500'
-          CsvFilePath: "./MSFT.csv"
+          CsvFilePath: "${{github.workspace}}/MSFT.csv"
         run: |
           dotnet run --project ./DoubletsVsClickHouseBenchmarks.Benchmarks/DoubletsVsClickHouseBenchmarks.Benchmarks.csproj --configuration Release

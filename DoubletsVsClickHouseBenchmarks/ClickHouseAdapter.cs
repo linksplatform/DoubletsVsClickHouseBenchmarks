@@ -10,6 +10,7 @@ public class ClickHouseAdapter : IBenchmarkable
     
     public ClickHouseAdapter(ClickHouseConnection сlickHouseConnection)
     {
+        Console.WriteLine($"сlickHouseConnection: {сlickHouseConnection}");
         ClickHouseConnection = сlickHouseConnection;
         ClickHouseConnection.ExecuteStatementAsync(@"
   CREATE TABLE IF NOT EXISTS candles (
