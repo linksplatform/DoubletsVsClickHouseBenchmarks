@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace DoubletsVsClickHouseBenchmarks
@@ -17,8 +19,9 @@ namespace DoubletsVsClickHouseBenchmarks
     {
         static void Main(string[] args)
         {
-            // var a = Parser.Default.ParseArguments<Options>(args);
-            var summary = BenchmarkRunner.Run<DoubletsVsClickHouseBenchmarks>();   
+            var config = DefaultConfig.Instance.WithSummaryStyle(
+                SummaryStyle.Default.WithMaxParameterColumnWidth(100));
+            BenchmarkRunner.Run<DoubletsVsClickHouseBenchmarks>(config);
         }
     }
 }
