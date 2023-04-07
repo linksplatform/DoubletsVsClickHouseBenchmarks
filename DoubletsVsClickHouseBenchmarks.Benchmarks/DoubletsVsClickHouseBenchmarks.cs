@@ -101,7 +101,7 @@ public class DoubletsVsClickHouseBenchmarks
     public void DoubletsSaveIterationCleanup()
     {
          var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         DoubletsAdapter.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
+         new ClickHouseAdapter(ClickHouseConnection).DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
     [IterationSetup(Target = nameof(ClickHouseGetBenchmark))]
@@ -131,7 +131,7 @@ public class DoubletsVsClickHouseBenchmarks
     }
 
     [IterationCleanup(Target = nameof(ClickHouseGetBenchmark))]
-    public void ClickHouseGetIterationCleanup()
+    public void GetIterationCleanup()
     {
          var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
          ClickHouseAdapter.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
