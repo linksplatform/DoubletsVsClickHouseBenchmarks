@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
@@ -16,16 +15,13 @@ public class DoubletsVsClickHouseBenchmarks
      {
           public Config()
           {
-               
-               AddJob(Job.ShortRun.WithWarmupCount(1).WithLaunchCount(1).WithIterationCount(1));
+               Add(Job.ShortRun.WithWarmupCount(1).WithLaunchCount(1).WithIterationCount(1));
           }
      }
     public static string CsvFilePath;
     public static ClickHouseConnection ClickHouseConnection;
     public static List<Candle> Candles;
     public static System.Random Random;
-    public static DoubletsAdapter<UInt64> DoubletsAdapter;
-    public static ClickHouseAdapter ClickHouseAdapter;
 
     static DoubletsVsClickHouseBenchmarks()
     {
@@ -34,10 +30,13 @@ public class DoubletsVsClickHouseBenchmarks
          Random = new System.Random();
          var clickHouseConnectionString = Environment.GetEnvironmentVariable(nameof(ClickHouseConnection)) ?? throw new Exception($"{nameof(ClickHouseConnection)} environment variable must be set"); 
          ClickHouseConnection = new ClickHouseConnection(clickHouseConnectionString);
-         DoubletsAdapter = new DoubletsAdapter<UInt64>();
-         ClickHouseAdapter = new ClickHouseAdapter(ClickHouseConnection);
     }
 
+    public static IEnumerable<IBenchmarkable> Benchmarkables() => new List<IBenchmarkable>()
+    {
+         new ClickHouseAdapter(ClickHouseConnection),
+         new DoubletsAdapter<UInt64>(),
+    };
     public (DateTimeOffset, DateTimeOffset) GenerateRandomMinAndMaxStartingTimes()
     {
          var randomStartingTime0 = Random.NextInt64(DateTimeOffset.Now.AddMonths(-1).ToUnixTimeSeconds(), DateTimeOffset.Now.ToUnixTimeSeconds());
@@ -52,96 +51,59 @@ public class DoubletsVsClickHouseBenchmarks
          }
     }
 
-    [IterationSetup(Target = nameof(ClickHouseDeleteBenchmark))]
-    public void ClickHouseDeleteIterationSetup()
+    [ParamsSource(nameof(Benchmarkables))]
+    public IBenchmarkable Benchmarkable { get; set; }
+
+    [IterationSetup]
+    public void IterationSetup()
     {
-         ClickHouseAdapter.SaveCandles(Candles).Wait();
+
     }
-    
-    [IterationSetup(Target = nameof(DoubletsDeleteBenchmark))]
-    public void DoubletsDeleteIterationSetup()
+
+    [IterationSetup(Target = nameof(DeleteBenchmark))]
+    public void DeleteIterationSetup()
     {
-         DoubletsAdapter.SaveCandles(Candles).Wait();
+         Benchmarkable.SaveCandles(Candles).Wait();
     }
 
     [Benchmark]
-    public void ClickHouseDeleteBenchmark()
+    public void DeleteBenchmark()
     {
          var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         ClickHouseAdapter.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
-    }
-    
-    [Benchmark]
-    public void DoubletsDeleteBenchmark()
-    {
-         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         DoubletsAdapter.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
+         Benchmarkable.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
     [Benchmark]
-    public void ClickHouseSaveBenchmark()
+    public void SaveBenchmark()
     {
-         ClickHouseAdapter.SaveCandles(Candles).Wait();
+         Benchmarkable.SaveCandles(Candles).Wait();
     }
     
-    [Benchmark]
-    public void DoubletsSaveBenchmark()
-    {
-         DoubletsAdapter.SaveCandles(Candles).Wait();
-    }
-    
-    [IterationCleanup(Target = nameof(ClickHouseSaveBenchmark))]
-    public void ClickHouseSaveIterationCleanup()
+    [IterationCleanup(Target = nameof(SaveBenchmark))]
+    public void SaveIterationCleanup()
     {
          var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         DoubletsAdapter.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
-    }
-    
-    [IterationCleanup(Target = nameof(DoubletsSaveBenchmark))]
-    public void DoubletsSaveIterationCleanup()
-    {
-         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         new ClickHouseAdapter(ClickHouseConnection).DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
+         Benchmarkable.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
-    [IterationSetup(Target = nameof(ClickHouseGetBenchmark))]
-    public void ClickHouseGetIterationSetup()
+    [IterationSetup(Target = nameof(GetBenchmark))]
+    public void GetIterationSetup()
     {
-         ClickHouseAdapter.SaveCandles(Candles).Wait();
-    }
-    
-    [IterationSetup(Target = nameof(DoubletsGetBenchmark))]
-    public void DoubletsGetIterationSetup()
-    {
-         DoubletsAdapter.SaveCandles(Candles).Wait();
+         Benchmarkable.SaveCandles(Candles).Wait();
     }
     
     [Benchmark]
-    public void ClickHouseGetBenchmark()
+    public void GetBenchmark()
     {
          var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         ClickHouseAdapter.GetCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
-    }
-    
-    [Benchmark]
-    public void DoubletsGetBenchmark()
-    {
-         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         DoubletsAdapter.GetCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
+         Benchmarkable.GetCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
-    [IterationCleanup(Target = nameof(ClickHouseGetBenchmark))]
+    [IterationCleanup(Target = nameof(GetBenchmark))]
     public void GetIterationCleanup()
     {
          var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         ClickHouseAdapter.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
-    }
-    
-    [IterationCleanup(Target = nameof(DoubletsGetBenchmark))]
-    public void DoubletsGetIterationCleanup()
-    {
-         var minAndMaxStartingTimes = GenerateRandomMinAndMaxStartingTimes();
-         DoubletsAdapter.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
+         Benchmarkable.DeleteCandles(minAndMaxStartingTimes.Item1, minAndMaxStartingTimes.Item2).Wait();
     }
 
 }
