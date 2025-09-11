@@ -48,7 +48,7 @@ public class DoubletsAdapter<TLinkAddress> : IBenchmarkable where TLinkAddress :
     {
         Console.WriteLine("New doublets storage");
         LinksConstants = new LinksConstants<TLinkAddress>(enableExternalReferencesSupport: true);
-        UnitedMemoryLinksStorage = new UnitedMemoryLinks<TLinkAddress>(memory: new FileMappedResizableDirectMemory(path: LinksStorageFilePath.Filename), memoryReservationStep: UnitedMemoryLinks<TLinkAddress>.DefaultLinksSizeStep, constants: LinksConstants, indexTreeType: IndexTreeType.Default);
+        UnitedMemoryLinksStorage = new UnitedMemoryLinks<TLinkAddress>(memory: new FileMappedResizableDirectMemory(path: LinksStorageFilePath.Filename), memoryReservationStep: UnitedMemoryLinks<TLinkAddress>.DefaultLinksSizeStep, constants: LinksConstants, indexTreeType: IndexTreeType.SizeBalancedTree);
         BalancedVariantConverter = new BalancedVariantConverter<TLinkAddress>(links: UnitedMemoryLinksStorage);
         TypeLinkAddress = UnitedMemoryLinksStorage.GetOrCreate(source: TLinkAddress.One, target: TLinkAddress.One);
         var typeIndex = TLinkAddress.One;
